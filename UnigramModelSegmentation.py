@@ -91,8 +91,7 @@ with open(opts.input) as f:
               chart[endindex] = objentry
           newindex = endindex + 1
           for newword in list_sorted:
-                if newword[0] in utf8line:
-                    if utf8line.startswith(newword[0], newindex, newindex + len(newword[0])):
+                if newword[0] in utf8line and utf8line.startswith(newword[0], newindex, newindex + len(newword[0])):
                         newentry = Entry(newword[0], newindex, prob + newword[2], objentry)
                         if newentry not in heap:
                             heap.append(newentry)
