@@ -1,2 +1,1 @@
-# NLP
-python implementations
+python implementation of different NLP tasks
