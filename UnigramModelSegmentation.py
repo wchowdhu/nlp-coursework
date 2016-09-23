@@ -48,7 +48,6 @@ class Entry(object):
 
 # the default segmenter does not use any probabilities, but you could ...
 Pw  = Pdist(opts.counts1w)
-# Standard output and standard error (commonly abbreviated stdout and stderr) are pipes that are built into every UNIX system. When you print something, it goes to the stdout pipe; when your program crashes and prints out debugging information (like a traceback in Python), it goes to the stderr pipe.
 # old = sys.stdout
 sys.stdout = codecs.lookup('utf-8')[-1](sys.stdout)
 list1 = []
