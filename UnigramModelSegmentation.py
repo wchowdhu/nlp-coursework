@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
-import sys, codecs, optparse, os, csv, operator, math, numpy as np
+import sys, codecs, optparse, os, operator, math, numpy as np
 
 # create an instance of the OptionParser class
 optparser = optparse.OptionParser()
