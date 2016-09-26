@@ -57,7 +57,7 @@ for line in list1:
     line.append(np.log2(Pw.__call__(line[0])))
 list_sorted = sorted(list1, key=lambda prob: prob[2], reverse=True)
 
-def checkBigram(utf8line, newindex, objentry, prob):
+def checkBigram(utf8line, newindex, objentry, prob, prevword):
 	for newword in list_sorted:
 		bigram = newword[0].replace(" ", "")
 		bigr = newword[0].split()
@@ -70,14 +70,18 @@ def checkBigram(utf8line, newindex, objentry, prob):
 				newentry = Entry(newword[0], newindex, np.sum([prob, newword[2]]), objentry)
 				if newentry not in heap:
 					heap.append(newentry)
+		elif (objentry is not None) and (bigr[0] == prevword):
+			length = utf8line.find(bigr[0])
+			if (length!=-1) and (utf8line.startswith(bigram, length, length + len(bigram))):
+				heap.append(Entry(newword[0], length, np.sum([prob, newword[2]]), objentry))
 
 def checkSingleWord(utf8line, newindex, oneword, objentry, prob):
 	if newindex <= len(oneword) - 1:
 		begin = [u'<S>']
 		begin.append(oneword[newindex])
 		if " ".join(begin) not in heap:
-			if newindex!=0:
-				heap.append(Entry(oneword[newindex], newindex, np.sum([prob, np.log2(Pw.__call__(oneword[newindex]))]), objentry))
+			if newindex!=3:
+				heap.append(Entry(" ".join(begin), newindex, np.sum([prob, np.log2(Pw.__call__(oneword[newindex]))]), objentry))
 			else:
 				heap.append(Entry(" ".join(begin), 0, np.log2(Pw.__call__(oneword[newindex])), None))
 
@@ -103,7 +107,7 @@ with open(opts.input) as f:
 	  utf8line = "".join(beg)
 	  chart = [None] * len(utf8line)
 	  oneword = [i for i in utf8line]
-	  checkBigram(utf8line, 0, None, 0)
+	  checkBigram(utf8line, 0, None, 0, u'')
 	  checkSingleWord(utf8line, 3, oneword, None, 0)
 	  while len(heap)!=0:
 		  objentry = heap[0]
@@ -123,7 +127,6 @@ with open(opts.input) as f:
 		  else:
 			  chart[endindex] = objentry
 		  newindex = endindex + 1
-		  checkBigram(utf8line, newindex, objentry, prob)
+		  checkBigram(utf8line, newindex, objentry, prob, wo[1])
 		  checkSingleWord(utf8line, newindex, oneword, objentry, prob)
-
 	  bestSeg(utf8line, chart)
