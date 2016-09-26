@@ -125,5 +125,4 @@ with open(opts.input) as f:
 		  newindex = endindex + 1
 		  checkBigram(utf8line, newindex, objentry, prob)
 		  checkSingleWord(utf8line, newindex, oneword, objentry, prob)
-
 	  bestSeg(utf8line, chart)
