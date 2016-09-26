@@ -26,9 +26,13 @@ class Pdist(dict):
 		self.N = float(N or sum(self.itervalues()))
 		self.missingfn = missingfn or (lambda k, N: 1./N)
 
-	def __call__(self, key):
+	def __call__(self, key, unigram_dict):
 		unigram = key.split()[0]
-		if key in self: return float(self[key]) / float(self.N)
+		if key in self:
+			if unigram in unigram_dict.keys():
+				return float(self[key])/float(unigram_dict[unigram])
+			else:
+				return float(self[key]) / float(self.N)
 		elif len(key) == 1: return self.missingfn(key, self.N)
 		else: return None
 
@@ -47,14 +51,14 @@ for line in file(opts.counts2w):
 	utf8key = unicode(bigram[0], 'utf-8')
 	list1.append([utf8key, int(bigram[1])])
 
-# unigram_dict = {}
-# for line in file(opts.counts1w):
-# 	(key, freq) = line.split('\t')
-# 	utf8key = unicode(key, 'utf-8')
-# 	unigram_dict[utf8key]=int(freq)
+unigram_dict = {}
+for line in file(opts.counts1w):
+	(key, freq) = line.split('\t')
+	utf8key = unicode(key, 'utf-8')
+	unigram_dict[utf8key]=int(freq)
 
 for line in list1:
-    line.append(np.log2(Pw.__call__(line[0])))
+    line.append(np.log2(Pw.__call__(line[0], unigram_dict)))
 list_sorted = sorted(list1, key=lambda prob: prob[2], reverse=True)
 
 def checkBigram(utf8line, newindex, objentry, prob):
@@ -70,13 +74,6 @@ def checkBigram(utf8line, newindex, objentry, prob):
 				newentry = Entry(newword[0], newindex, np.sum([prob, newword[2]]), objentry)
 				if newentry not in heap:
 					heap.append(newentry)
-		elif (utf8line.find(bigr[0]) >= newindex) and (utf8line.find(bigr[1]) >= newindex) and (utf8line.find(bigr[0]) + len(bigram)-1 <= len(utf8line)-1):
-			print newindex, newword[0], utf8line.find(bigr[0])
-			heap.append(Entry(newword[0], utf8line.find(bigr[0]), np.sum([prob, newword[2]]), objentry))
-
-
-
-
 
 def checkSingleWord(utf8line, newindex, oneword, objentry, prob):
 	if newindex <= len(oneword) - 1:
@@ -84,9 +81,9 @@ def checkSingleWord(utf8line, newindex, oneword, objentry, prob):
 		begin.append(oneword[newindex])
 		if " ".join(begin) not in heap:
 			if newindex!=0:
-				heap.append(Entry(oneword[newindex], newindex, np.sum([prob, np.log2(Pw.__call__(oneword[newindex]))]), objentry))
+				heap.append(Entry(oneword[newindex], newindex, np.sum([prob, np.log2(Pw.__call__(oneword[newindex], unigram_dict))]), objentry))
 			else:
-				heap.append(Entry(" ".join(begin), 0, np.log2(Pw.__call__(oneword[newindex])), None))
+				heap.append(Entry(" ".join(begin), 0, np.log2(Pw.__call__(oneword[newindex], unigram_dict)), None))
 
 def bestSeg(utf8line, chart):
 	finalindex = len(utf8line) - 1
@@ -102,8 +99,7 @@ def bestSeg(utf8line, chart):
 	bestsegmentation.reverse()
 	print " ".join(bestsegmentation)
 
-with open(r'C:\Users\user\Desktop\SFU\Fall2016\CMPT825\Assignments\HW1\nlp-class-hw\segmenter\sample_input.txt') as f:
-# with open(opts.input) as f:
+with open(opts.input) as f:
   for line in f:
 	  beg = [u'<S>']
 	  heap = []
@@ -130,11 +126,7 @@ with open(r'C:\Users\user\Desktop\SFU\Fall2016\CMPT825\Assignments\HW1\nlp-class
 				  continue
 		  else:
 			  chart[endindex] = objentry
-		  # print 'w', wo[0], wo[1]
-		  index = utf8line.find(wo[1])
-		  if(index!=-1):
-			  newindex = index
-			  checkBigram(utf8line, newindex, objentry, prob)
-			  checkSingleWord(utf8line, newindex, oneword, objentry, prob)
-
+		  newindex = endindex + 1
+		  checkBigram(utf8line, newindex, objentry, prob)
+		  checkSingleWord(utf8line, newindex, oneword, objentry, prob)
 	  bestSeg(utf8line, chart)
