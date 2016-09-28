@@ -41,49 +41,34 @@ class Entry(object):
 
 Pw  = Pdist(opts.counts2w)
 sys.stdout = codecs.lookup('utf-8')[-1](sys.stdout)
-list1 = []
+# list1 = []
+list_sorted = []
 for line in file(opts.counts2w):
-	bigram = line.split('\t')
-	utf8key = unicode(bigram[0], 'utf-8')
-	list1.append([utf8key, int(bigram[1])])
+    bigram = line.split('\t')
+    utf8key = unicode(bigram[0], 'utf-8')
+    list_sorted.append([utf8key, int(bigram[1])])
 
-# unigram_dict = {}
-# for line in file(opts.counts1w):
-# 	(key, freq) = line.split('\t')
-# 	utf8key = unicode(key, 'utf-8')
-# 	unigram_dict[utf8key]=int(freq)
-
-for line in list1:
+for line in list_sorted:
     line.append(np.log2(Pw.__call__(line[0])))
-list_sorted = sorted(list1, key=lambda prob: prob[2], reverse=True)
+# list_sorted = sorted(list1, key=lambda prob: prob[2], reverse=True)
 
-def checkBigram(utf8line, newindex, objentry, prob, prevword):
+def checkBigram(utf8line, newindex, objentry, prob):
 	for newword in list_sorted:
-		bigram = newword[0].replace(" ", "")
 		bigr = newword[0].split()
+		bigram = newword[0].replace(" ", "")
 		if bigram in utf8line and utf8line.startswith(bigram, newindex, newindex + len(bigram)):
 			newentry = Entry(newword[0], newindex, np.sum([prob, newword[2]]), objentry)
 			if newentry not in heap:
 				heap.append(newentry)
-		elif bigr[0] == u'<S>':
-			if utf8line.startswith(bigr[1], newindex, newindex + len(bigr[1])):
-				newentry = Entry(newword[0], newindex, np.sum([prob, newword[2]]), objentry)
-				if newentry not in heap:
-					heap.append(newentry)
-		elif (objentry is not None) and (bigr[0] == prevword):
-			length = utf8line.find(bigr[0])
-			if (length!=-1) and (utf8line.startswith(bigram, length, length + len(bigram))):
-				heap.append(Entry(newword[0], length, np.sum([prob, newword[2]]), objentry))
 
-def checkSingleWord(utf8line, newindex, oneword, objentry, prob):
+def checkSingleWord(newindex, oneword, objentry, prob):
 	if newindex <= len(oneword) - 1:
 		begin = [u'<S>']
 		begin.append(oneword[newindex])
-		if " ".join(begin) not in heap:
-			if newindex!=3:
-				heap.append(Entry(" ".join(begin), newindex, np.sum([prob, np.log2(Pw.__call__(oneword[newindex]))]), objentry))
-			else:
-				heap.append(Entry(" ".join(begin), 0, np.log2(Pw.__call__(oneword[newindex])), None))
+		if newindex!=3 and oneword[newindex] not in heap:
+			heap.append(Entry(oneword[newindex], newindex, np.sum([prob, np.log2(Pw.__call__(oneword[newindex]))]), objentry))
+		elif newindex==3 and " ".join(begin) not in heap:
+			heap.append(Entry(" ".join(begin), 0, np.log2(Pw.__call__(oneword[newindex])), None))
 
 def bestSeg(utf8line, chart):
 	finalindex = len(utf8line) - 1
@@ -107,18 +92,15 @@ with open(opts.input) as f:
 	  utf8line = "".join(beg)
 	  chart = [None] * len(utf8line)
 	  oneword = [i for i in utf8line]
-	  checkBigram(utf8line, 0, None, 0, u'')
-	  checkSingleWord(utf8line, 3, oneword, None, 0)
+	  checkBigram(utf8line, 0, None, 0)
+	  checkSingleWord(3, oneword, None, 0)
 	  while len(heap)!=0:
 		  objentry = heap[0]
 		  word = heap[0].word
 		  prob = heap[0].logprob
 		  startpos = heap[0].startpos
 		  heap.remove(heap[0])
-		  wo = word.split()
 		  endindex = startpos + len(word.replace(" ", "")) - 1
-		  if wo[0]==u'<S>' and startpos!=0:
-			  endindex = startpos + len(wo[1])-1
 		  if chart[endindex] is not None:
 			  if prob > chart[endindex].logprob:
 				  chart[endindex] = objentry
@@ -127,6 +109,6 @@ with open(opts.input) as f:
 		  else:
 			  chart[endindex] = objentry
 		  newindex = endindex + 1
-		  checkBigram(utf8line, newindex, objentry, prob, wo[1])
-		  checkSingleWord(utf8line, newindex, oneword, objentry, prob)
+		  checkBigram(utf8line, newindex, objentry, prob)
+		  checkSingleWord(newindex, oneword, objentry, prob)
 	  bestSeg(utf8line, chart)
