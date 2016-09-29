@@ -1,4 +1,4 @@
-import sys, codecs, optparse, os, math, numpy as np
+import sys, codecs, optparse, os, math
 import Queue as Q
 
 optparser = optparse.OptionParser()
@@ -34,57 +34,38 @@ class Pdist(dict):
         self.missingfn = missingfn or (lambda k, N: 1./N)
 
     def __call__(self, key):
-        if key in self:
-            return float(self[key])/float(self.N)
+        if key in self: return float(self[key])/float(self.N)
+        #else: return self.missingfn(key, self.N)
         elif len(key) == 1: return self.missingfn(key, self.N)
         else: return None
+
+def findlogp(word):
+    logp = Pw("".join(word))
+    if logp is None:
+        return 0
+    else:
+        return math.log(logp)
 
 def traceSeq(chart, sent):
     output = []
     entry = chart[len(sent)-1]
     while entry is not None:
-        str = entry.word.split()
-        if str[0]==u'<S>':
-            output.insert(0,str[1])
-            entry = entry.pre
-        else:
-            output.insert(0, entry.word)
-            entry = entry.pre
+        output.insert(0,entry.word)
+        entry = entry.pre
     return output
-
-def checkBigram(sent, heap, index, entry, prob):
-    for i in range(index, len(sent)):
-        end = i + 1
-        word = sent[index:end]
-        if len(word)==1:
-            e = Entry(word, index, np.sum([np.log2(Pw(word)), prob]), entry)
-            heap.put(e)
-        if index == 0:
-            beg = [u'<S>']
-            beg.append(word)
-            word = " ".join(beg)
-            if Pw(word) is not None:
-                e = Entry(word, index, np.sum([np.log2(Pw(word)), prob]), entry)
-                heap.put(e)
-        for i in range(end,len(sent)):
-            word2 = sent[end:i+1]
-            bigram = word+' '+word2
-            bigram_prob = Pw(word+' '+word2)
-            if bigram_prob is not None:
-                e = Entry(bigram, index, np.sum([np.log2(bigram_prob), prob]), entry)
-                heap.put(e)
 
 def segment(sent, Pw):
     heap = Q.PriorityQueue()
     chart = [None]*len(sent)
-    checkBigram(sent, heap, 0, None, 0)
+    for i in range(len(sent)):
+        word = sent[:i+1]
+        logp = findlogp(word)
+        # print word, logp
+        if logp != 0:
+            heap.put(Entry(word,0,logp,None))
     while not heap.empty():
         entry = heap.get()
-        prob = entry.logp
-        str = entry.word.split()
-        endindex = entry.start + len(entry.word.replace(" ", "")) - 1
-        if str[0]== u'<S>':
-            endindex = entry.start + len(str[1]) - 1
+        endindex = entry.start + len(entry.word) -1
         if chart[endindex] is None:
             chart[endindex] = entry
         else:
@@ -93,15 +74,22 @@ def segment(sent, Pw):
             else:
                 chart[endindex] = entry
         nstart = endindex + 1
-        checkBigram(sent, heap, nstart, entry, prob)
+        for i in range(nstart,len(sent)):
+            word = sent[nstart:i+1]
+            # print word, findlogp(word)
+            if findlogp(word) != 0:
+                e = Entry(word,nstart,findlogp(word) + entry.logp, entry)
+                heap.put(e)
     output = traceSeq(chart, sent)
     return output
 
 if __name__ == "__main__":
-    Pw  = Pdist(opts.counts2w)
+    Pw  = Pdist(opts.counts1w)
     old = sys.stdout
     sys.stdout = codecs.lookup('utf-8')[-1](sys.stdout)
+    # ignoring the dictionary provided in opts.counts
     with open(opts.input) as f:
+    # with open(r'C:\Users\user\Desktop\SFU\Fall2016\CMPT825\Assignments\HW1\nlp-class-hw\segmenter\sample_input.txt') as f:
         for line in f:
             utf8line = unicode(line.strip(), 'utf-8')
             output = segment(utf8line,Pw);
