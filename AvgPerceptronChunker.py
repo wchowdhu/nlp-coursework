@@ -58,9 +58,6 @@ def perc_train(train_data, tagset, numepochs):
                         feat_vec_cache[(f, gold[i])] = feat_vec_cache[(f, gold[i])] + 1*(float(step/numepochs*T))
             step-=1
         print >>sys.stderr, "iteration %d done."%i
-    # for key, value in feat_vec_cache.items():
-    #     (feature, label) = key
-    #     feat_vec_cache[(feature, label)] = float(feat_vec_cache[(feature, label)]) / float(counter)
     return feat_vec_cache
 
 
