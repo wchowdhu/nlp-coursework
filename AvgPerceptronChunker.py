@@ -70,7 +70,7 @@ class Chunker(object):
     def computeAvgWeights(self):
         for key, value in self.feat_vec_cache.items():
             (feature, label) = key
-            self.feat_vec_cache[(feature, label)] = round(self.feat_vec_cache[(feature, label)]) / float(self.counter)
+            self.feat_vec_cache[(feature, label)] = float(self.feat_vec_cache[(feature, label)]) / float(self.counter)
         return self.feat_vec_cache
 
 if __name__ == '__main__':
