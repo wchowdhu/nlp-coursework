@@ -98,9 +98,6 @@ if __name__ == '__main__':
     # train_data is a list of 8936 tuples, where each tuple=([list of labeled words making up each sentence],[list of features for those words of that sentence])
     # (['Confidence NN B-NP', 'in IN B-PP', 'the DT B-NP', 'pound NN I-NP', 'is VBZ B-VP', 'widely RB I-VP','expected VBN I-VP', 'to TO I-VP', 'take VB I-VP', 'another DT B-NP', 'sharp JJ I-NP', 'dive NN I-NP',.....,'. . O'], ['U00:_B-2', 'U01:_B-1', 'U02:Confidence', 'U03:in', 'U04:the', 'U05:_B-1/Confidence', 'U06:Confidence/in',......, 'U17:./_B+1', 'U18:_B+1/_B+2', 'U20:JJ/NNS/.', 'U21:NNS/./_B+1', 'U22:./_B+1/_B+2', 'B'])
     train_data = perc.read_labeled_data(opts.trainfile, opts.featfile)
-    # print 'train_data', type(train_data), len(train_data)
-    # for i in train_data:
-    #     print type(i), len(i), i
     print >>sys.stderr, "done."
     c = Chunker()
     feat_vec = c.perc_train(train_data, tagset, int(opts.numepochs))
