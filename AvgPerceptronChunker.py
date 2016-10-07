@@ -54,6 +54,11 @@ def perc_train(train_data, tagset, numepochs):
                     for f in features:
                         feat_vec[(f,cur[i])] = feat_vec[(f,cur[i])] - 1
                         feat_vec[(f,gold[i])] = feat_vec[(f,gold[i])] + 1
+                        # averaged perceptron
+                        # usual way of averaging over all intermediate weight vectors is:
+                        # w = (w0 + w1 + w2 + ...... + wt) / (numepochs * T)
+                        # But we can also average in an efficient way:
+                        # w = w1*(step/numepochs*T) + w2*(step-1/numepochs*T) + w3*(step-2/numepochs*T) + ...... + wt*(1/numepochs*T)
                         feat_vec_cache[(f, cur[i])] = feat_vec_cache[(f, cur[i])] - 1*(float(step/numepochs*T))
                         feat_vec_cache[(f, gold[i])] = feat_vec_cache[(f, gold[i])] + 1*(float(step/numepochs*T))
             step-=1
