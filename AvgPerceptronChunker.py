@@ -84,16 +84,11 @@ if __name__ == '__main__':
     # tagset contains list of the tags in tagset.txt
     # ['B-NP', 'I-NP', 'O', 'B-VP', 'B-PP', 'I-VP', 'B-ADVP', 'B-SBAR', 'B-ADJP', 'I-ADJP', 'B-PRT', 'I-ADVP', 'I-PP', 'I-CONJP', 'I-SBAR', 'B-CONJP', 'B-INTJ', 'B-LST', 'I-INTJ', 'I-UCP', 'I-PRT', 'I-LST', 'B-UCP']
     tagset = perc.read_tagset(opts.tagsetfile)
-    # print 'tagset', tagset
     print >>sys.stderr, "reading data ..."
     # opts.trainfile contains the labeled training data with word, POS, chunk tag in each line
     # opts.featfile contain unigram and bigram features with their feature id
     # train_data is a list of 8936 tuples, where each tuple=([list of labeled words making up each sentence],[list of features for those words of that sentence])
-    # (['Confidence NN B-NP', 'in IN B-PP', 'the DT B-NP', 'pound NN I-NP', 'is VBZ B-VP', 'widely RB I-VP','expected VBN I-VP', 'to TO I-VP', 'take VB I-VP', 'another DT B-NP', 'sharp JJ I-NP', 'dive NN I-NP',.....,'. . O'], ['U00:_B-2', 'U01:_B-1', 'U02:Confidence', 'U03:in', 'U04:the', 'U05:_B-1/Confidence', 'U06:Confidence/in',......, 'U17:./_B+1', 'U18:_B+1/_B+2', 'U20:JJ/NNS/.', 'U21:NNS/./_B+1', 'U22:./_B+1/_B+2', 'B'])
     train_data = perc.read_labeled_data(opts.trainfile, opts.featfile)
-    # print 'train_data', type(train_data), len(train_data)
-    # for i in train_data:
-    #     print type(i), len(i), i
     print >>sys.stderr, "done."
     feat_vec = perc_train(train_data, tagset, int(opts.numepochs))
     perc.perc_write_to_file(feat_vec, opts.modelfile)
