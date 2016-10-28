@@ -39,8 +39,6 @@ def Lexical_Aligner(bitext, numepochs):
     #                   Training
     # ==========================================
     t = fe_count
-    # dict.fromkeys(seq[, value]))
-    # method fromkeys() creates a new dictionary with keys from seq (e.g. t) and values set to value (e.g. float(1/len(f_count)))
     # Initializing values of t uniformly means that every French word is equally likely for every English word
     t = dict.fromkeys(t, float(1/len(f_count)))
     # for each iteration
