@@ -68,7 +68,7 @@ def Lexical_Aligner(bitext, numepochs):
     for (f, e) in bitext:
         for (i, f_i) in enumerate(f):
             bestp = t[(f_i, None)]
-            bestj = None
+            bestj = 0
             for (j, e_j) in enumerate(e):
                 if t[(f_i, e_j)] > bestp:
                     bestp = t[(f_i, e_j)]
