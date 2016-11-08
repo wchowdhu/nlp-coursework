@@ -14,7 +14,7 @@ def find_beam(stack):
     max = beam[0].logprob
     # beam_width = (max + min)/2.0
     # beam_filtered = [hypothesis for hypothesis in beam if hypothesis.logprob >= beam_width]
-    # beam_width = log10(0.00000001) = -7
+    # beam_width = log10(0.00000001) = -8
     beam_width = log10(0.00000001)
     beam_filtered = [hypothesis     for hypothesis in beam     if hypothesis.logprob >= (max + beam_width)]
     # beam_filtered = [hypothesis     for hypothesis in beam      if abs(max - hypothesis.logprob) <= abs(beam_width)]
