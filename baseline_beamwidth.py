@@ -15,7 +15,6 @@ def find_beam(stack):
     min = beam[-1].logprob
     # beam_width = (max + min)/2.0
     # beam_filtered = [hypothesis for hypothesis in beam if hypothesis.logprob >= beam_width]
-    # beam_width = log10(0.00000001) = -8
     beam_width = log10(0.00000001)
     beam_filtered = [hypothesis     for hypothesis in beam     if hypothesis.logprob >= (max + beam_width)]
     # beam_filtered = [hypothesis     for hypothesis in beam      if abs(max - hypothesis.logprob) <= abs(beam_width)]
@@ -72,7 +71,7 @@ def beam_stack_decode(french, tm, lm, opts):
             # Iterating on Pruned Hypotheses - Histogram Pruning
             # beam[:opt_s] = take top opt_s states per stack
             # instead apply beam width limit here e.g limit on number of states to consider per stack
-            for h in beam:
+            for h in beam[:opt_s]:
 
                 # Iterating over all phrase possibilities
                 probable_phrases = []
