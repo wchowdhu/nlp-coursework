@@ -12,6 +12,7 @@ from math import log10
 def find_beam(stack):
     beam = sorted(stack.itervalues(), key=lambda h: -h.logprob)
     max = beam[0].logprob
+    min = beam[-1].logprob
     # beam_width = (max + min)/2.0
     # beam_filtered = [hypothesis for hypothesis in beam if hypothesis.logprob >= beam_width]
     # beam_width = log10(0.00000001) = -8
