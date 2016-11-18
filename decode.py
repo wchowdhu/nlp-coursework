@@ -52,7 +52,8 @@ def beam_stack_decode(french, tm, lm, opts):
     o_eta = opts.eta
     o_s  = opts.s
     o_distort = opts.distort
-    if len(f) < 9:
+    o_k = opts.k
+    if len(f) < 10:
       o_eta = 0.7
       o_s = 3000
       o_distort = 4
@@ -105,7 +106,7 @@ def beam_stack_decode(french, tm, lm, opts):
               for bt in xrange(x,y):
                 new_bit_vec[bt] = 1
 
-              for phrase in tm[f_phrase]:
+              for phrase in tm[f_phrase][:o_k]:
 
                 # Adding the phrase translation probability
                 logprob = h.logprob + phrase.logprob
