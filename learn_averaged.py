@@ -2,11 +2,6 @@
 import optparse, sys, os, bleu, random, math
 from collections import namedtuple
 
-optparser = optparse.OptionParser()
-optparser.add_option("-n", "--nbest", dest="nbest", default=os.path.join("data", "train.nbest"), help="N-best file")
-optparser.add_option("-r", "--reference", dest="reference", default=os.path.join("data", "train.en"), help="English reference sentences")
-(opts, _) = optparser.parse_args()
-
 # samples generated from n-best list per input sentence
 tau = 5000
 # sampler acceptance cutoff
@@ -100,6 +95,11 @@ def computePRO(nbests,theta):
 
 
 if __name__ == "__main__":
+  optparser = optparse.OptionParser()
+  optparser.add_option("-n", "--nbest", dest="nbest", default=os.path.join("data", "train.nbest"), help="N-best file")
+  optparser.add_option("-r", "--reference", dest="reference", default=os.path.join("data", "train.en"),help="English reference sentences")
+  (opts, _) = optparser.parse_args()
+
   output = computeNBests()
   weights = computePRO(output[0],output[1])
   print "\n".join([str(weight) for weight in weights])
