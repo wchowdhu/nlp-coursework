@@ -57,7 +57,7 @@ def computeNBests():
     translation = namedtuple("translation", "sentence, smoothed_bleu, features")
     nbests[int(i.strip())].append(translation(sentence, score, features))
     # theta = [float(1.0) for _ in xrange(len(features))]
-    theta = [random.uniform(-1*sys.maxint, 1*sys.maxint) for _ in xrange(len(features))]
+    theta = [random.uniform(-1*sys.maxint, 1.0) for _ in xrange(len(features))]
   return [nbests,theta]
 
 def computePRO(nbests,theta):
