@@ -9,7 +9,7 @@ import time
 from collections import namedtuple
 
 # samples generated from n-best list per input sentence
-tau = 1000
+tau = 5000
 # sampler acceptance cutoff
 alpha = 0.1
 # training data generated from the samples tau
