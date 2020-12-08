@@ -1,1 +1,1 @@
-python implementation of different NLP tasks
+Project work for the Natural Language Processing course (CMPT 825 - SFU)
